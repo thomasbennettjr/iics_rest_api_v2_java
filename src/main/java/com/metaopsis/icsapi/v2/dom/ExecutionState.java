@@ -1,32 +1,29 @@
 package com.metaopsis.icsapi.v2.dom;
 
-public enum TaskType {
-    DMASK {
+public enum ExecutionState {
+    INITIALIZED {
         public String toString() {
-            return "DMASK";
+            return "INITIALIZED";
         }
     },
-    DRS {
+    RUNNING {
         public String toString() {
-            return "DRS";
+            return "RUNNING";
         }
     },
-    DSS {
+    STOPPING {
         public String toString() {
-            return "DSS";
+            return "STOPPING";
         }
     },
-    MTT {
+    COMPLETED {
         public String toString() {
-            return "MTT";
+            return "COMPLETED";
         }
     },
-    PCS {
+    FAILED {
         public String toString() {
-            return "PCS";
+            return "FAILED";
         }
-    },
-    WORKFLOW {
-        public String toString() { return "WORKFLOW"; }
     }
 }

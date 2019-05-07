@@ -2,7 +2,7 @@ package com.metaopsis.icsapi.v2.services;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.metaopsis.icsapi.v2.dom.Org;
+import com.metaopsis.icsapi.v2.dom.Agent;
 import com.metaopsis.icsapi.v2.dom.User;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpEntity;
@@ -12,19 +12,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriUtils;
 
-import java.io.StringWriter;
-import java.io.Writer;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
-
-public class OrgService {
+public class AgentService {
     final static Logger logger = Logger.getLogger(LoginService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;
     private User user;
 
-    public OrgService(User user)
+    public AgentService(User user)
     {
         this.user = user;
 
@@ -43,23 +38,22 @@ public class OrgService {
         this.rest.setErrorHandler(new CustomResponseErrorHandler());
     }
 
-    public Org getOrg() throws InformaticaCloudException
+    public Agent[] getAllAgents() throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::getOrg::enter");
-        Writer jsonWriter = new StringWriter();
+        logger.info(this.getClass().getName()+"::getAllAgents::enter");
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-        Org response = null;
+        Agent[] response;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org", HttpMethod.GET, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/agent", HttpMethod.GET, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 Org " + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 All Agents " + responseEntity.getStatusCode().toString());
             if (responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = mapper.readValue(responseEntity.getBody(), Org.class);
+                response = mapper.readValue(responseEntity.getBody(), Agent[].class);
             } else {
                 logger.error(responseEntity.toString());
                 throw new InformaticaCloudException(responseEntity.toString());
@@ -69,27 +63,27 @@ public class OrgService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
-        logger.info(this.getClass().getName()+"::getOrg::exit");
+        logger.info(this.getClass().getName()+"::getAllAgents::exit");
+
         return response;
     }
 
-    public Org getSubOrgById(String id) throws InformaticaCloudException
+    public Agent getAgentById(String id) throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::getSubOrgById::enter");
-        Writer jsonWriter = new StringWriter();
+        logger.info(this.getClass().getName()+"::getAgentById::enter");
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-        Org response = null;
+        Agent response;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org/" + id, HttpMethod.GET, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/agent/" + id, HttpMethod.GET, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 SubOrg By Id " + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 Agent By Id " + responseEntity.getStatusCode().toString());
             if (responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = mapper.readValue(responseEntity.getBody(), Org.class);
+                response = mapper.readValue(responseEntity.getBody(), Agent.class);
             } else {
                 logger.error(responseEntity.toString());
                 throw new InformaticaCloudException(responseEntity.toString());
@@ -99,27 +93,27 @@ public class OrgService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
-        logger.info(this.getClass().getName()+"::getSubOrgById::exit");
+        logger.info(this.getClass().getName()+"::getAgentById::exit");
+
         return response;
     }
 
-    public Org getSubOrgByName(String name) throws InformaticaCloudException
+    public Agent getAgentByName(String name) throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::getSubOrgByName::enter");
-        Writer jsonWriter = new StringWriter();
+        logger.info(this.getClass().getName()+"::getAgentByName::enter");
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-        Org response = null;
+        Agent response;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org/name/" + UriUtils.encode(name, "UTF-8"), HttpMethod.GET, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/agent/name/" + UriUtils.encode(name, "UTF-8"), HttpMethod.GET, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 SubOrg By Name " + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 Agent By Name " + responseEntity.getStatusCode().toString());
             if (responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = mapper.readValue(responseEntity.getBody(), Org.class);
+                response = mapper.readValue(responseEntity.getBody(), Agent.class);
             } else {
                 logger.error(responseEntity.toString());
                 throw new InformaticaCloudException(responseEntity.toString());
@@ -129,45 +123,27 @@ public class OrgService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
-        logger.info(this.getClass().getName()+"::getSubOrgByName::exit");
-        return response;
-    }
-
-    public Org createOrg(Org org) throws InformaticaCloudException
-    {
-        logger.info(this.getClass().getName()+"::createOrg::enter");
-        Org response =  doOrg(org, false);
-        logger.info(this.getClass().getName()+"::createOrg::exit");
+        logger.info(this.getClass().getName()+"::getAgentByName::exit");
 
         return response;
     }
 
-    public Org updateOrg(Org org) throws InformaticaCloudException
+    public Agent[] getAllAgentsDetails() throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::updateOrg::enter");
-        Org response =  doOrg(org, true);
-        logger.info(this.getClass().getName()+"::updateOrg::exit");
-
-        return response;
-    }
-
-    private Org doOrg(Org org, boolean doUpdate) throws InformaticaCloudException
-    {
-        Writer jsonWriter = new StringWriter();
+        logger.info(this.getClass().getName()+"::getAllAgentsDetails::enter");
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-        Org response = null;
+        Agent[] response;
         try {
-            mapper.writeValue(jsonWriter, org);
-            jsonWriter.flush();
-            requestEntity = new HttpEntity<String>(jsonWriter.toString(), headers);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org" + (doUpdate ? "/"+org.getOrgId() : ""), HttpMethod.POST, requestEntity, String.class);
+            requestEntity = new HttpEntity<String>(null, headers);
 
-            logger.info("Informatica Cloud V2 " + (doUpdate ? "Update Org" : "Create Org")  + responseEntity.getStatusCode().toString());
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/agent/details", HttpMethod.GET, requestEntity, String.class);
+
+            logger.info("Informatica Cloud V2 All Agents Details " + responseEntity.getStatusCode().toString());
             if (responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = mapper.readValue(responseEntity.getBody(), Org.class);
+                response = mapper.readValue(responseEntity.getBody(), Agent[].class);
             } else {
                 logger.error(responseEntity.toString());
                 throw new InformaticaCloudException(responseEntity.toString());
@@ -177,10 +153,42 @@ public class OrgService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
+        logger.info(this.getClass().getName()+"::getAllAgentsDetails::exit");
+
         return response;
     }
 
-    public void delete(String orgId) throws InformaticaCloudException
+    public Agent getAgentDetailsById(String id) throws InformaticaCloudException
+    {
+        logger.info(this.getClass().getName()+"::getAgentDetails::enter");
+        HttpEntity<String> requestEntity = null;
+        ResponseEntity<String> responseEntity = null;
+        Agent response;
+        try {
+
+            requestEntity = new HttpEntity<String>(null, headers);
+
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/agent/details/" + id, HttpMethod.GET, requestEntity, String.class);
+
+            logger.info("Informatica Cloud V2 Agent Details " + responseEntity.getStatusCode().toString());
+            if (responseEntity.getStatusCode().is2xxSuccessful())
+            {
+                response = mapper.readValue(responseEntity.getBody(), Agent.class);
+            } else {
+                logger.error(responseEntity.toString());
+                throw new InformaticaCloudException(responseEntity.toString());
+            }
+        } catch(Exception e)
+        {
+            throw new InformaticaCloudException(e.getMessage());
+        }
+
+        logger.info(this.getClass().getName()+"::getAgentDetails::exit");
+
+        return response;
+    }
+
+    public void delete(String id) throws InformaticaCloudException
     {
         logger.info(this.getClass().getName()+"::delete::enter");
         HttpEntity<String> requestEntity = null;
@@ -188,9 +196,9 @@ public class OrgService {
 
         try {
             requestEntity = new HttpEntity<String>(null, headers);
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org/" + orgId, HttpMethod.DELETE, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/agent/" + id, HttpMethod.DELETE, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 Delete Org "  + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 Delete Agent "  + responseEntity.getStatusCode().toString());
 
             if (!responseEntity.getStatusCode().is2xxSuccessful())
                 throw new InformaticaCloudException(responseEntity.getBody());
