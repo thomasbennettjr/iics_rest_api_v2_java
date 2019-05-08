@@ -67,7 +67,7 @@ public class AuditLogService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
-        logger.info(this.getClass().getName()+"::auditLog::enter");
+        logger.info(this.getClass().getName()+"::auditLog::exit");
 
         return response;
     }
