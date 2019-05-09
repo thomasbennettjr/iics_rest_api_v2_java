@@ -2,6 +2,7 @@ package com.metaopsis.icsapi.v2.services;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.metaopsis.icsapi.v2.dom.ErrorObject;
 import com.metaopsis.icsapi.v2.dom.SamlCredentials;
 import com.metaopsis.icsapi.v2.dom.User;
 import org.apache.log4j.Logger;
@@ -47,6 +48,7 @@ public class LoginSamlService {
         Writer jsonWriter = new StringWriter();
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
+        ErrorObject errorObject = null;
         try {
             mapper.writeValue(jsonWriter, credentials);
             jsonWriter.flush();
@@ -60,8 +62,9 @@ public class LoginSamlService {
             {
                 user = mapper.readValue(responseEntity.getBody(), User.class);
             } else {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
-                throw new InformaticaCloudException(responseEntity.toString());
+                throw new InformaticaCloudException(errorObject.toString());
             }
         } catch(Exception e)
         {

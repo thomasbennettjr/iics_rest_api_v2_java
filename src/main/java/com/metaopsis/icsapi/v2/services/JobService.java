@@ -2,6 +2,7 @@ package com.metaopsis.icsapi.v2.services;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.metaopsis.icsapi.v2.dom.ErrorObject;
 import com.metaopsis.icsapi.v2.dom.Job;
 import com.metaopsis.icsapi.v2.dom.User;
 import org.apache.log4j.Logger;
@@ -48,6 +49,7 @@ public class JobService {
         Writer jsonWriter = new StringWriter();
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
+        ErrorObject errorObject = null;
         try {
             mapper.writeValue(jsonWriter, job);
             jsonWriter.flush();
@@ -61,8 +63,9 @@ public class JobService {
             {
                 response = mapper.readValue(responseEntity.getBody(), Job.class);
             } else {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
-                throw new InformaticaCloudException(responseEntity.toString());
+                throw new InformaticaCloudException(errorObject.toString());
             }
         } catch(Exception e)
         {
@@ -73,14 +76,14 @@ public class JobService {
         return response;
     }
 
-    public boolean stop(Job job) throws InformaticaCloudException
+    public void stop(Job job) throws InformaticaCloudException
     {
         logger.debug(job.toString());
         logger.info(this.getClass().getName()+"::stop::enter");
-        boolean response;
         Writer jsonWriter = new StringWriter();
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
+        ErrorObject errorObject = null;
         try {
             mapper.writeValue(jsonWriter, job);
             jsonWriter.flush();
@@ -90,12 +93,11 @@ public class JobService {
             responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/job/stop", HttpMethod.POST, requestEntity, String.class);
 
             logger.info("Informatica Cloud V2 Job Stop " + responseEntity.getStatusCode().toString());
-            if (responseEntity.getStatusCode().is2xxSuccessful())
+            if (!responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = true;
-            } else {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
-                response = false;
+                throw new InformaticaCloudException(errorObject.toString());
             }
         } catch(Exception e)
         {
@@ -103,6 +105,5 @@ public class JobService {
         }
 
         logger.info(this.getClass().getName()+"::stop::exit");
-        return response;
     }
 }

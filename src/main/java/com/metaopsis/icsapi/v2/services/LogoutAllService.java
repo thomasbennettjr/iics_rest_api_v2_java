@@ -3,6 +3,7 @@ package com.metaopsis.icsapi.v2.services;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metaopsis.icsapi.v2.dom.Credentials;
+import com.metaopsis.icsapi.v2.dom.ErrorObject;
 import com.metaopsis.icsapi.v2.dom.User;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpEntity;
@@ -43,7 +44,7 @@ public class LogoutAllService {
 
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-
+        ErrorObject errorObject = null;
         try {
             this.headers.add("icSessionId", user.getIcSessionId());
             requestEntity = new HttpEntity<String>(null, headers);
@@ -54,8 +55,9 @@ public class LogoutAllService {
 
             if (!responseEntity.getStatusCode().is2xxSuccessful())
             {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
-                throw new InformaticaCloudException(responseEntity.toString());
+                throw new InformaticaCloudException(errorObject.toString());
             }
         } catch(Exception e)
         {

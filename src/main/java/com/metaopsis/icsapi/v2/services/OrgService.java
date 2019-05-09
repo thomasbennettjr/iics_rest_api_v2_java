@@ -2,6 +2,7 @@ package com.metaopsis.icsapi.v2.services;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.metaopsis.icsapi.v2.dom.ErrorObject;
 import com.metaopsis.icsapi.v2.dom.Org;
 import com.metaopsis.icsapi.v2.dom.User;
 import org.apache.log4j.Logger;
@@ -50,6 +51,7 @@ public class OrgService {
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
         Org response = null;
+        ErrorObject errorObject = null;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
@@ -61,8 +63,9 @@ public class OrgService {
             {
                 response = mapper.readValue(responseEntity.getBody(), Org.class);
             } else {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
-                throw new InformaticaCloudException(responseEntity.toString());
+                throw new InformaticaCloudException(errorObject.toString());
             }
         } catch(Exception e)
         {
@@ -80,6 +83,7 @@ public class OrgService {
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
         Org response = null;
+        ErrorObject errorObject = null;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
@@ -91,8 +95,9 @@ public class OrgService {
             {
                 response = mapper.readValue(responseEntity.getBody(), Org.class);
             } else {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
-                throw new InformaticaCloudException(responseEntity.toString());
+                throw new InformaticaCloudException(errorObject.toString());
             }
         } catch(Exception e)
         {
@@ -110,6 +115,7 @@ public class OrgService {
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
         Org response = null;
+        ErrorObject errorObject = null;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
@@ -121,8 +127,9 @@ public class OrgService {
             {
                 response = mapper.readValue(responseEntity.getBody(), Org.class);
             } else {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
-                throw new InformaticaCloudException(responseEntity.toString());
+                throw new InformaticaCloudException(errorObject.toString());
             }
         } catch(Exception e)
         {
@@ -157,6 +164,7 @@ public class OrgService {
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
         Org response = null;
+        ErrorObject errorObject = null;
         try {
             mapper.writeValue(jsonWriter, org);
             jsonWriter.flush();
@@ -169,8 +177,9 @@ public class OrgService {
             {
                 response = mapper.readValue(responseEntity.getBody(), Org.class);
             } else {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
-                throw new InformaticaCloudException(responseEntity.toString());
+                throw new InformaticaCloudException(errorObject.toString());
             }
         } catch(Exception e)
         {
@@ -185,15 +194,17 @@ public class OrgService {
         logger.info(this.getClass().getName()+"::delete::enter");
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-
+        ErrorObject errorObject = null;
         try {
             requestEntity = new HttpEntity<String>(null, headers);
             responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org/" + orgId, HttpMethod.DELETE, requestEntity, String.class);
 
             logger.info("Informatica Cloud V2 Delete Org "  + responseEntity.getStatusCode().toString());
 
-            if (!responseEntity.getStatusCode().is2xxSuccessful())
-                throw new InformaticaCloudException(responseEntity.getBody());
+            if (!responseEntity.getStatusCode().is2xxSuccessful()) {
+                errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
+                throw new InformaticaCloudException(errorObject.toString());
+            }
         } catch(Exception e)
         {
             throw new InformaticaCloudException(e.getMessage());

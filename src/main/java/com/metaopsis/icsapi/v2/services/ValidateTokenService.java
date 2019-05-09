@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metaopsis.icsapi.v2.dom.ErrorObject;
 import com.metaopsis.icsapi.v2.dom.User;
+import com.metaopsis.icsapi.v2.dom.ValidateToken;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -11,14 +12,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-public class LogoutService {
-    private User user = null;
+import java.io.StringWriter;
+import java.io.Writer;
+
+public class ValidateTokenService {
     final static Logger logger = Logger.getLogger(LoginService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;
+    private User user;
 
-    public LogoutService(User user)
+    public ValidateTokenService(User user)
     {
         this.user = user;
 
@@ -37,24 +41,26 @@ public class LogoutService {
         this.rest.setErrorHandler(new CustomResponseErrorHandler());
     }
 
-    public void logout() throws InformaticaCloudException
+    public ValidateToken validate(ValidateToken request) throws InformaticaCloudException
     {
-        logger.debug(user.toString());
-        logger.info(this.getClass().getName()+"::logout::enter");
-
+        logger.info(this.getClass().getName()+"::validate::enter");
+        Writer jsonWriter = new StringWriter();
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
         ErrorObject errorObject = null;
+        ValidateToken response = null;
         try {
+            mapper.writeValue(jsonWriter, request);
+            jsonWriter.flush();
 
-            requestEntity = new HttpEntity<String>(null, headers);
+            requestEntity = new HttpEntity<String>(jsonWriter.toString(), headers);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/user/logout", HttpMethod.POST, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/user/validSessionId", HttpMethod.POST, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 Logout " + responseEntity.getStatusCode().toString());
-
-            if (!responseEntity.getStatusCode().is2xxSuccessful())
-            {
+            logger.info("Informatica Cloud V2 Validate Token " + responseEntity.getStatusCode().toString());
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                response = mapper.readValue(responseEntity.getBody(), ValidateToken.class);
+            } else {
                 errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
                 throw new InformaticaCloudException(errorObject.toString());
@@ -64,7 +70,7 @@ public class LogoutService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
-        logger.info(this.getClass().getName()+"::logout::exit");
-
+        logger.info(this.getClass().getName()+"::validate::exit");
+        return response;
     }
 }
