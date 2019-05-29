@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriUtils;
 
 public class RuntimeEnvironmentService {
-    final static Logger logger = Logger.getLogger(LoginService.class);
+    final static Logger logger = Logger.getLogger(RuntimeEnvironmentService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;

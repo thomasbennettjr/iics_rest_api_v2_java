@@ -16,7 +16,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 public class ScheduleService {
-    final static Logger logger = Logger.getLogger(LoginService.class);
+    final static Logger logger = Logger.getLogger(ScheduleService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;

@@ -15,7 +15,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 public class RegisterService {
-    final static Logger logger = Logger.getLogger(LoginService.class);
+    final static Logger logger = Logger.getLogger(RegisterService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;

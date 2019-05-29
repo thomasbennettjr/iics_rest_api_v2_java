@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 public class ServerTimeService {
-    final static Logger logger = Logger.getLogger(LoginService.class);
+    final static Logger logger = Logger.getLogger(ServerTimeService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;

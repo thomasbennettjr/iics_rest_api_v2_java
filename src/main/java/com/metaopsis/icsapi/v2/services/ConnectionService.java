@@ -18,7 +18,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 
 public class ConnectionService {
-    final static Logger logger = Logger.getLogger(LoginService.class);
+    final static Logger logger = Logger.getLogger(ConnectionService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;

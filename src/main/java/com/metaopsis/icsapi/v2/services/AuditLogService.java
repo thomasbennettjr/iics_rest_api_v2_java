@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
 public class AuditLogService {
-    final static Logger logger = Logger.getLogger(LoginService.class);
+    final static Logger logger = Logger.getLogger(AuditLogService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;

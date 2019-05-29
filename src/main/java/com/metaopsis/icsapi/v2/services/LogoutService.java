@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 
 public class LogoutService {
     private User user = null;
-    final static Logger logger = Logger.getLogger(LoginService.class);
+    final static Logger logger = Logger.getLogger(LogoutService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;

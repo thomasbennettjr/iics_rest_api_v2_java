@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 
 public class LogoutAllService {
     private Url url = null;
-    final static Logger logger = Logger.getLogger(LogoutService.class);
+    final static Logger logger = Logger.getLogger(LogoutAllService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;

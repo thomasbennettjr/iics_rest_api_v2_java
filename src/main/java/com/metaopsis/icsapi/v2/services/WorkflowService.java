@@ -3,8 +3,9 @@ package com.metaopsis.icsapi.v2.services;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.metaopsis.icsapi.v2.dom.ErrorObject;
-import com.metaopsis.icsapi.v2.dom.Org;
 import com.metaopsis.icsapi.v2.dom.User;
+import com.metaopsis.icsapi.v2.dom.di.UpdateMode;
+import com.metaopsis.icsapi.v2.dom.di.Workflow;
 import org.apache.log4j.Logger;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -15,19 +16,30 @@ import org.springframework.web.util.UriUtils;
 
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.URLEncoder;
-import java.nio.charset.Charset;
 
-public class OrgService {
-    final static Logger logger = Logger.getLogger(OrgService.class);
+public class WorkflowService {
+    final static Logger logger = Logger.getLogger(WorkflowService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;
     private User user;
+    private UpdateMode mode;
 
-    public OrgService(User user)
+    public WorkflowService(User user, UpdateMode mode)
+    {
+        init(user, mode);
+    }
+
+    public WorkflowService(User user)
+    {
+        init(user, UpdateMode.FULL);
+
+    }
+
+    private void init(User user, UpdateMode mode)
     {
         this.user = user;
+        this.mode = mode;
 
         // Set HttpHeaders for request
         this.headers = new HttpHeaders();
@@ -44,24 +56,24 @@ public class OrgService {
         this.rest.setErrorHandler(new CustomResponseErrorHandler());
     }
 
-    public Org getOrg() throws InformaticaCloudException
+    public Workflow[] getAllWorkflow() throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::getOrg::enter");
+        logger.info(this.getClass().getName()+"::getAllWorkflow::enter");
         Writer jsonWriter = new StringWriter();
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-        Org response = null;
+        Workflow[] response = null;
         ErrorObject errorObject = null;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org", HttpMethod.GET, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/workflow", HttpMethod.GET, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 Org " + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 Workflow " + responseEntity.getStatusCode().toString());
             if (responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = mapper.readValue(responseEntity.getBody(), Org.class);
+                response = mapper.readValue(responseEntity.getBody(), Workflow[].class);
             } else {
                 errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
@@ -72,28 +84,28 @@ public class OrgService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
-        logger.info(this.getClass().getName()+"::getOrg::exit");
+        logger.info(this.getClass().getName()+"::getAllWorkflow::exit");
         return response;
     }
 
-    public Org getSubOrgById(String id) throws InformaticaCloudException
+    public Workflow getWorkflowById(String id) throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::getSubOrgById::enter");
+        logger.info(this.getClass().getName()+"::getWorkflowById::enter");
         Writer jsonWriter = new StringWriter();
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-        Org response = null;
+        Workflow response = null;
         ErrorObject errorObject = null;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org/" + id, HttpMethod.GET, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/workflow/" + id, HttpMethod.GET, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 SubOrg By Id " + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 Workflow By Id " + responseEntity.getStatusCode().toString());
             if (responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = mapper.readValue(responseEntity.getBody(), Org.class);
+                response = mapper.readValue(responseEntity.getBody(), Workflow.class);
             } else {
                 errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
@@ -104,28 +116,28 @@ public class OrgService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
-        logger.info(this.getClass().getName()+"::getSubOrgById::exit");
+        logger.info(this.getClass().getName()+"::getWorkflowById::exit");
         return response;
     }
 
-    public Org getSubOrgByName(String name) throws InformaticaCloudException
+    public Workflow getWorkflowByName(String name) throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::getSubOrgByName::enter");
+        logger.info(this.getClass().getName()+"::getWorkflowByName::enter");
         Writer jsonWriter = new StringWriter();
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-        Org response = null;
+        Workflow response = null;
         ErrorObject errorObject = null;
         try {
 
             requestEntity = new HttpEntity<String>(null, headers);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org/name/" + UriUtils.encode(name, "UTF-8"), HttpMethod.GET, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/workflow/name/" + UriUtils.encode(name, "UTF-8"), HttpMethod.GET, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 SubOrg By Name " + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 Workflow By Name " + responseEntity.getStatusCode().toString());
             if (responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = mapper.readValue(responseEntity.getBody(), Org.class);
+                response = mapper.readValue(responseEntity.getBody(), Workflow.class);
             } else {
                 errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
@@ -136,46 +148,47 @@ public class OrgService {
             throw new InformaticaCloudException(e.getMessage());
         }
 
-        logger.info(this.getClass().getName()+"::getSubOrgByName::exit");
+        logger.info(this.getClass().getName()+"::getWorkflowByName::exit");
         return response;
     }
 
-    public Org createOrg(Org org) throws InformaticaCloudException
+    public Workflow createWorkflow(Workflow workflow) throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::createOrg::enter");
-        Org response =  doOrg(org, false);
-        logger.info(this.getClass().getName()+"::createOrg::exit");
+        logger.info(this.getClass().getName()+"::createWorkflow::enter");
+        Workflow response =  doOrg(workflow, false);
+        logger.info(this.getClass().getName()+"::createWorkflow::exit");
 
         return response;
     }
 
-    public Org updateOrg(Org org) throws InformaticaCloudException
+    public Workflow updateWorkflow(Workflow workflow) throws InformaticaCloudException
     {
-        logger.info(this.getClass().getName()+"::updateOrg::enter");
-        Org response =  doOrg(org, true);
-        logger.info(this.getClass().getName()+"::updateOrg::exit");
+        logger.info(this.getClass().getName()+"::updateWorkflow::enter");
+        Workflow response =  doOrg(workflow, true);
+        logger.info(this.getClass().getName()+"::updateWorkflow::exit");
 
         return response;
     }
 
-    private Org doOrg(Org org, boolean doUpdate) throws InformaticaCloudException
+    private Workflow doOrg(Workflow workflow, boolean doUpdate) throws InformaticaCloudException
     {
         Writer jsonWriter = new StringWriter();
         HttpEntity<String> requestEntity = null;
         ResponseEntity<String> responseEntity = null;
-        Org response = null;
+        Workflow response = null;
         ErrorObject errorObject = null;
         try {
-            mapper.writeValue(jsonWriter, org);
+            mapper.writeValue(jsonWriter, workflow);
             jsonWriter.flush();
             requestEntity = new HttpEntity<String>(jsonWriter.toString(), headers);
+            if (this.mode == UpdateMode.PARTIAL)
+                this.headers.add("Update-Mode","PARTIAL");
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/workflow" + (doUpdate ? "/"+workflow.getId() : ""), HttpMethod.POST, requestEntity, String.class);
 
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org" + (doUpdate ? "/"+org.getOrgId() : ""), HttpMethod.POST, requestEntity, String.class);
-
-            logger.info("Informatica Cloud V2 " + (doUpdate ? "Update Org" : "Create Org")  + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 " + (doUpdate ? "Update Workflow" : "Create Workflow")  + responseEntity.getStatusCode().toString());
             if (responseEntity.getStatusCode().is2xxSuccessful())
             {
-                response = mapper.readValue(responseEntity.getBody(), Org.class);
+                response = mapper.readValue(responseEntity.getBody(), Workflow.class);
             } else {
                 errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);
                 logger.error(responseEntity.toString());
@@ -189,7 +202,7 @@ public class OrgService {
         return response;
     }
 
-    public void delete(String orgId) throws InformaticaCloudException
+    public void delete(String taskId) throws InformaticaCloudException
     {
         logger.info(this.getClass().getName()+"::delete::enter");
         HttpEntity<String> requestEntity = null;
@@ -197,9 +210,9 @@ public class OrgService {
         ErrorObject errorObject = null;
         try {
             requestEntity = new HttpEntity<String>(null, headers);
-            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/org/" + orgId, HttpMethod.DELETE, requestEntity, String.class);
+            responseEntity = rest.exchange(user.getServerUrl()+"/api/v2/workflow/" + taskId, HttpMethod.DELETE, requestEntity, String.class);
 
-            logger.info("Informatica Cloud V2 Delete Org "  + responseEntity.getStatusCode().toString());
+            logger.info("Informatica Cloud V2 Delete Workflow "  + responseEntity.getStatusCode().toString());
 
             if (!responseEntity.getStatusCode().is2xxSuccessful()) {
                 errorObject = mapper.readValue(responseEntity.getBody(), ErrorObject.class);

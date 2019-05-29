@@ -18,7 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class ActivityLogService {
-    final static Logger logger = Logger.getLogger(LoginService.class);
+    final static Logger logger = Logger.getLogger(ActivityLogService.class);
     private ObjectMapper mapper;
     private RestTemplate rest;
     private HttpHeaders headers;
